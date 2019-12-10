@@ -183,8 +183,7 @@ b = -30
 # How to add "e"
 dat_model_log = dat %>%
   mutate(default = as.integer(default)) %>%
-  mutate(logistic_reg = (exp(m*balance + b))/(1 + (exp(m*balance + b)))) %>%
-  mutate(default = default - 1) #converts 1,2 to 0,1
+  mutate(logistic_reg = (exp(m*balance + b))/(1 + (exp(m*balance + b))))
 
 head(dat_model_log)
 ```
@@ -205,8 +204,7 @@ b = -10.651331
 # How to add "e"
 dat_model_log = dat %>%
   mutate(default = as.integer(default)) %>%
-  mutate(logistic_reg = (exp(m*balance + b))/(1 + (exp(m*balance + b)))) %>%
-  mutate(default = default - 1) #converts 1,2 to 0,1
+  mutate(logistic_reg = (exp(m*balance + b))/(1 + (exp(m*balance + b)))) 
 
 dat_model_log %>%
   ggplot(aes(x = balance)) + 
@@ -285,7 +283,7 @@ The function `confusionMatrix` shows quite a bit more information but requires s
 ```{r}
 probability_threshold = 0.9
 preds = as.factor(predictions > probability_threshold)
-actuals = as.factor(as.logical(as.numeric(dat$default) - 1))
+actuals = as.factor(as.logical(dat$default))
 
 confusionMatrix(preds, actuals)
 ```
@@ -312,7 +310,7 @@ summary(model_log)
 probability_threshold = 0.5
 predictions = predict(model_log, type = 'response', data = dat)
 preds = as.factor(predictions > probability_threshold)
-actuals = as.factor(as.logical(as.numeric(dat$default) - 1))
+actuals = as.factor(as.logical(dat$default))
 
 confusionMatrix(preds, actuals)
 ```
@@ -358,7 +356,7 @@ probability_threshold = 0.5
 
 predictions = predict(model_log, newdata = dat_test, type = 'response')
 preds = as.factor(predictions > probability_threshold)
-actuals = as.factor(as.logical(as.numeric(dat_test$default)-1))
+actuals = as.factor(as.logical(dat_test$default))
 
 confusionMatrix(preds, actuals)
 ```
@@ -369,6 +367,7 @@ Due to the massive imbalance in our training data, the base rate fallacy hasn't 
 
 How can we fix the issue of class imbalance?
 ```{r}
+dat_train = dat_train %>% mutate(default = as.factor(default))
 dat_train %>%
   group_by(default) %>%
   count()
@@ -389,12 +388,13 @@ summary(model_log)
 
 Should we upsample the test data as well?
 
+How do you like this model in comparison?
 ```{r}
 probability_threshold = 0.5
 
 predictions = predict(model_log, newdata = dat_test, type = 'response')
 preds = as.factor(predictions > probability_threshold)
-actuals = as.factor(as.logical(as.numeric(dat_test$default)-1))
+actuals = as.factor(as.logical(dat_test$default))
 
 confusionMatrix(preds, actuals)
 ```
